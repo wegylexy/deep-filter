@@ -86,3 +86,9 @@ pub unsafe fn df_process_frame(st: *mut DFState, input: &[f32]) -> js_sys::Float
     let _lsnr = state.0.process(input, output_view).expect("Failed to process DF frame");
     js_sys::Float32Array::from(output.as_slice().unwrap())
 }
+
+/// Free a DeepFilterNet Model
+#[wasm_bindgen]
+pub unsafe extern "C" fn df_free(st: *mut DFState) {
+    let _ = Box::from_raw(st);
+}
