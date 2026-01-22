@@ -77,14 +77,11 @@ pub unsafe fn df_set_post_filter_beta(st: *mut DFState, beta: f32) {
 /// Returns:
 ///     - Local SNR of the current frame.
 #[wasm_bindgen]
-pub unsafe fn df_process_frame(st: *mut DFState, input: &[f32]) -> js_sys::Float32Array {
+pub unsafe fn df_process_frame(st: *mut DFState, input: &[f32], output: &mut [f32]) -> f32 {
     let state = st.as_mut().expect("Invalid pointer");
     let input = ArrayView2::from_shape((1, state.0.hop_size), input).unwrap();
-
-    let mut output = Array2::zeros((1, state.0.hop_size));
-    let output_view = output.view_mut();
-    let _lsnr = state.0.process(input, output_view).expect("Failed to process DF frame");
-    js_sys::Float32Array::from(output.as_slice().unwrap())
+    let output = ArrayViewMut2::from_shape((1, state.0.hop_size), output).unwrap();
+    state.0.process(input, output).expect("Failed to process DF frame")
 }
 
 /// Free a DeepFilterNet Model
