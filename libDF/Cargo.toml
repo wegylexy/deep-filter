@@ -1,6 +1,6 @@
 [package]
 name = "deep_filter"
-version = "0.5.7-pre2"
+version = "0.5.7-pre3"
 authors = ["Hendrik Schröter"]
 edition = "2021"
 description = "Noise supression using deep filtering"
@@ -166,9 +166,3 @@ assets = [
 
 [package.metadata.wasm-pack.profile.release]
 wasm-opt = ["-O4", "--enable-simd"]
-
-[profile.release]
-opt-level = 3     # Maximum speed optimization
-lto = true        # Link Time Optimization (smaller/faster binary)
-codegen-units = 1 # Allows more aggressive optimization
-panic = "abort"   # Reduces binary size and improves speed

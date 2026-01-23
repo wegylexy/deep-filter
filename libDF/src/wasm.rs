@@ -10,8 +10,26 @@ pub struct DFState(crate::tract::DfTract);
 
 #[wasm_bindgen]
 impl DFState {
-    fn new(model_bytes: &[u8], channels: usize, atten_lim: f32) -> Self {
-        let r_params = RuntimeParams::default_with_ch(channels).with_atten_lim(atten_lim);
+    fn new(
+        model_bytes: &[u8],
+        channels: usize,
+        atten_lim: f32,
+        min_db_thresh: f32,
+        max_db_erb_thresh: f32,
+        max_db_df_thresh: f32,
+        post_filter: bool,
+        post_filter_beta: f32,
+        reduce_mask: i32,
+    ) -> Self {
+        let mut r_params = RuntimeParams::default_with_ch(channels)
+            .with_atten_lim(atten_lim)
+            .with_thresholds(min_db_thresh, max_db_erb_thresh, max_db_df_thresh);
+        if post_filter {
+            r_params = r_params.with_post_filter(post_filter_beta)
+        }
+        if let Ok(red) = reduce_mask.try_into() {
+            r_params = r_params.with_mask_reduce(red);
+        }
         let df_params = DfParams::from_bytes(model_bytes).expect("Could not load model from path");
         let m =
             DfTract::new(df_params, &r_params).expect("Could not initialize DeepFilter runtime.");
@@ -35,8 +53,24 @@ pub unsafe fn df_create(
     model_bytes: &[u8],
     // channels: usize,
     atten_lim: f32,
+    min_db_thresh: f32,
+    max_db_erb_thresh: f32,
+    max_db_df_thresh: f32,
+    post_filter: bool,
+    post_filter_beta: f32,
+    reduce_mask: i32,
 ) -> *mut DFState {
-    let df = DFState::new(model_bytes, 1, atten_lim);
+    let df = DFState::new(
+        model_bytes,
+        1,
+        atten_lim,
+        min_db_thresh,
+        max_db_erb_thresh,
+        max_db_df_thresh,
+        post_filter,
+        post_filter_beta,
+        reduce_mask,
+    );
     Box::into_raw(df.boxed())
 }
 
