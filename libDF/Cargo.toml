@@ -29,6 +29,11 @@ name = "deep-filter"
 path = "src/bin/enhance_wav.rs"
 required-features = ["bin", "tract", "wav-utils", "transforms"]
 
+[[bin]]
+name = "deep-filter-pipe"
+path = "src/bin/pipe.rs"
+required-features = ["bin", "tract"]
+
 [features]
 default = ["default-model", "vorbis", "flac"]
 
